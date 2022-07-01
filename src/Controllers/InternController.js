@@ -25,7 +25,7 @@ const intern = async function (req, res) {
             collegeId:id
         }
         let createIntern = await InternModel.create(newData);
-        let finelResult=await InternModel.findOne({_id:createIntern._id}).select({_id:0,__v:0})
+        let finelResult=await InternModel.findOne({_id:createIntern._id}).select({_id:0,__v:0,createdAt:0,updatedAt:0})
       
         res.status(201).send({ status: true, data: finelResult })
     } catch (err) {

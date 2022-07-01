@@ -18,7 +18,7 @@ const college = async function (req, res) {
         let CollegeName = data.fullName;
         data.fullName = startUpperCase(CollegeName);
         let createCollege = await CollegeModel.create(data);
-        let finelResult=await CollegeModel.findOne({_id:createCollege._id}).select({_id:0,__v:0})
+        let finelResult=await CollegeModel.findOne({_id:createCollege._id}).select({_id:0,__v:0,createdAt:0,updatedAt:0})
         res.status(201).send({ status: true, data: finelResult })
 
     }
@@ -32,9 +32,10 @@ const college = async function (req, res) {
 let getDetails = async function (req, res) {
     try {
         let collegeName = req.query.collegeName
-        if (!collegeName) { return res.status(400).send({ status: false, msg: "collgeName is required" }) }
         collegeName = collegeName.trim()
         collegeName = collegeName.toLowerCase()
+        if (!collegeName) { return res.status(400).send({ status: false, msg: "collgeName is required" }) }
+        
         let findName = await CollegeModel.findOne({ name: collegeName })
         if (!findName) { return res.status(404).send({ status: false, msg: "collge does not exists" }) }
         let id = findName._id.toString()

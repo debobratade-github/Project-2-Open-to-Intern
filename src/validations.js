@@ -48,14 +48,14 @@ const validator1 = async function (req, res, next) {
 
 const validator2 = async function (req, res, next) {
     try {
-        let name = req.body.name;
+        let name = req.body.name;//rec.body{name,email,mobile}
         if (!x(name)) return res.status(400).send({ status: false, message: "Please enter name" });
 
         let email = req.body.email;
         if (!x(email)) return res.status(400).send({ status: false, message: "Please enter email" })
         if (!email.match(email1)) return res.status(400).send({ status: false, message: "Please Enter Valid email" })
         let usedemail = await InternModel.findOne({ email: email })
-        if (usedemail) return res.status(403).send({ status: false, message: "This emailId has already been used" })
+        if (usedemail) return res.status(400).send({ status: false, message: "This emailId has already been used" })
 
         let mobile = req.body.mobile;
         if (!mobile) return res.status(400).send({ status: false, message: "Please enter mobile" })
