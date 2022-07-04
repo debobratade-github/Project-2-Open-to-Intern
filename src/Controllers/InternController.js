@@ -1,31 +1,24 @@
 const InternModel = require("../Models/InternModels.js");
-const CollegeModel=require("../Models/CollegeModels")
+const convupper=require('../Controllers/CollegeControllers.js')
 
-function startUpperCase(x) {
-    const a = x.split(" ");
-    for (var i = 0; i < a.length; i++) {
-        a[i] = a[i].charAt(0).toUpperCase() + a[i].slice(1).toLowerCase();
-    }
-    x = a.join(" ");
-    return x
-}
+
+//  **************************** API to create intern document ********************
+
 
 const intern = async function (req, res) {
     try {
-        let data = req.body;
+        let data = req.info;
         let Name = data.name;
-        let CollName=data.collegeName.toLowerCase()
-        let findCollegeId = await CollegeModel.findOne({name:CollName}).select({_id:1})
-        let id=findCollegeId._id
-        data.name = startUpperCase(Name);
-        let newData = {
+        data.name = convupper.convupper(Name);
+        const id=req.id
+        const newData = {
             name: data.name,
             email: data.email,
             mobile: data.mobile,
             collegeId:id
         }
-        let createIntern = await InternModel.create(newData);
-        let finelResult=await InternModel.findOne({_id:createIntern._id}).select({_id:0,__v:0,createdAt:0,updatedAt:0})
+        const createIntern = await InternModel.create(newData);
+        const finelResult=await InternModel.findOne({_id:createIntern._id}).select({_id:0,__v:0,createdAt:0,updatedAt:0})
       
         res.status(201).send({ status: true, data: finelResult })
     } catch (err) {
@@ -35,6 +28,4 @@ const intern = async function (req, res) {
 }
 
 
-module.exports = {
-    intern
-}
+module.exports = { intern }

@@ -1,24 +1,30 @@
+
 const CollegeModel = require("../Models/CollegeModels.js");
 const InternModel = require("../Models/InternModels.js");
 
-function startUpperCase(x) {
+
+//*********** Function to capitalize first alphabet of each words in a string *********
+
+const convupper= function startUpperCase(x) {
     const a = x.split(" ");
     for (var i = 0; i < a.length; i++) {
         a[i] = a[i].charAt(0).toUpperCase() + a[i].slice(1).toLowerCase();
-    }
+    }   
     x = a.join(" ");
     return x
 }
 
+//  **************************** API to create college document ********************
 
 
 const college = async function (req, res) {
-    try {
-        let data = req.body;
-        let CollegeName = data.fullName;
-        data.fullName = startUpperCase(CollegeName);
-        let createCollege = await CollegeModel.create(data);
-        let finelResult=await CollegeModel.findOne({_id:createCollege._id}).select({_id:0,__v:0,createdAt:0,updatedAt:0})
+
+    try{
+
+        let data = req.info
+        data.fullName=convupper(data.fullName) 
+        const createCollege = await CollegeModel.create(data);
+        const finelResult=await CollegeModel.findOne({_id:createCollege._id}).select({_id:0,__v:0,createdAt:0,updatedAt:0})
         res.status(201).send({ status: true, data: finelResult })
 
     }
@@ -28,21 +34,23 @@ const college = async function (req, res) {
 
 }
 
+// ********************** API to get details of interns and college ********************
+
 
 let getDetails = async function (req, res) {
+
     try {
+
         let collegeName = req.query.collegeName
+        if (!collegeName) { return res.status(400).send({ status: false, msg: "Collge name is required" }) }
         collegeName = collegeName.trim()
-        collegeName = collegeName.toLowerCase()
-        if (!collegeName) { return res.status(400).send({ status: false, msg: "collgeName is required" }) }
-        
-        let findName = await CollegeModel.findOne({ name: collegeName })
-        if (!findName) { return res.status(404).send({ status: false, msg: "collge does not exists" }) }
-        let id = findName._id.toString()
-        let findIntern = await InternModel.find({ collegeId: id }).select({ name: 1, email: 1, mobile: 1 })
+        const findName = await CollegeModel.findOne({ name: collegeName })
+        if (!findName) { return res.status(404).send({ status: false, msg: "Collge does not exists" }) }
+        const id = findName._id
+        const findIntern = await InternModel.find({ collegeId: id }).select({ name: 1, email: 1, mobile: 1 })
         if (!findIntern.length > 0) { return res.status(404).send({ status: false, msg: "No Intern found" }) }
-        let newData = {
-            name: collegeName,
+        const newData = {
+            name: collegeName.toLowerCase(),
             fullName: findName.fullName,
             logoLink: findName.logoLink,
             interns: findIntern
@@ -54,7 +62,4 @@ let getDetails = async function (req, res) {
     }
 }
 
-module.exports = {
-    college,
-    getDetails
-}
+module.exports = { college, getDetails, convupper }
